@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentinal</title>
+    <link rel="stylesheet" href="static/css/style1.css">
+    <link rel="icon" type="image/png" href="static/images/logo.png">
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <img src="static/images/logo.png" alt="Logo">
+        </div>
+        <p>Enhance your customer support with Sentinal. Analyze and understand customer emotions to provide better, more responsive service. <br>
+            You can add Company Name, Company Link, and select the file type to upload a document.</p>
+    </header>
+
+    <section>
+        <form id="taskForm" enctype="multipart/form-data">
+            <div class="input-box">
+                <label for="companyName" style="font-weight: bold; color: white;">Company Name:</label>
+                <input type="text" id="companyName" name="companyName" required>
+            </div>
+            <div class="input-box">
+                <label for="companyLink" style="font-weight: bold; color: white;">Company Link:</label>
+                <input type="url" id="companyLink" name="companyLink" required>
+            </div>
+            <div class="input-box">
+                <label for="fileType" style="font-weight: bold; color: white;">File Type:</label>
+                <div class="dropdown">
+                    <input type="checkbox" id="dropdown">
+                    <label class="dropdown__face" for="dropdown">
+                        <div class="dropdown__text" id="dropdownText">Select file type</div>
+                        <div class="dropdown__arrow"></div>
+                    </label>
+                    <ul class="dropdown__items">
+                        <li onclick="selectFileType('PDF')" style="font-weight: bold; color: rgb(0, 0, 0);">PDF</li>
+                        <li onclick="selectFileType('DOCX')" style="font-weight: bold; color: rgb(0, 0, 0);">DOCX</li>
+                        <li onclick="selectFileType('TXT')" style="font-weight: bold; color: rgb(0, 0, 0);">TXT</li>
+                    </ul>
+                </div>
+            </div>
+            <input type="hidden" id="fileType" name="fileType" required>
+            <div class="input-box">
+                <label for="fileInput">Upload File:</label>
+                <input type="file" id="fileInput" name="fileInput" required>
+            </div>
+        </form>
+        <button class="button-89" role="button" onclick="submitForm()">Continue to Chatbot</button>
+    </section>
+    <svg>
+        <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+            <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+            <feBlend in="SourceGraphic" in2="goo" />
+        </filter>
+    </svg>
+
+    <div class="container mt-5">
+        <div id="loadingContainer" style="display: none;">
+            <div class="loader"></div>
+            <div id="loadingMessage">Processing request...</div>
+        </div>
+
+        <div class="container mt-5">
+            <div class="mt-5">
+                <h2>Processed Content</h2>
+                <div id="outputContent" class="border p-3"></div>
+                <div id="errorMessage" class="text-danger mt-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectFileType(type) {
+            document.getElementById('fileType').value = type;
+            document.getElementById('dropdownText').innerText = type;
+            document.getElementById('dropdown').checked = false;
+
+            const fileInput = document.getElementById('fileInput');
+            fileInput.value = ''; // Clear the file input
+            fileInput.setAttribute('accept', `.${type.toLowerCase()}`);
+        }
+
+        async function submitForm() {
+            const companyName = document.getElementById('companyName').value.trim();
+            const companyLink = document.getElementById('companyLink').value.trim();
+            const fileType = document.getElementById('fileType').value.trim().toLowerCase();
+            const fileInput = document.getElementById('fileInput');
+            const fileName = fileInput.value.toLowerCase();
+            const outputContent = document.getElementById('outputContent');
+            const errorMessage = document.getElementById('errorMessage');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const loadingMessage = document.getElementById('loadingMessage');
+
+            // Clear previous messages
+            errorMessage.innerText = '';
+            outputContent.innerHTML = '';
+
+            if (!fileName.endsWith(`.${fileType}`)) {
+                alert(`Please upload a ${fileType.toUpperCase()} file.`);
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('companyName', companyName);
+            formData.append('companyLink', companyLink);
+            formData.append('fileType', fileType);
+            formData.append('fileInput', fileInput.files[0]);
+        
+            // Send the data asynchronously without waiting for the response
+            fetch('/submit', {
+                method: 'POST',
+                body: formData
+            });
+        
+            // Immediately redirect to the chatbot page
+            window.location.href = "/chatbot";
+        
+        }
+    </script>
+</body>
+
+</html>
