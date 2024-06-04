@@ -15,6 +15,8 @@ app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+company = "."
+url = "."
 
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
@@ -39,26 +41,14 @@ class ProcessRequest(BaseModel):
     company_link: str
 '''
 
-'''
+
 @app.post("/submit")
-async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...), fileType: str = Form(...), fileInput: UploadFile = File(...)):
-    # Process the text fields
-    print(f"Company Name: {companyName}")
-    print(f"Company Link: {companyLink}")
-    print(f"File Type: {fileType}")
+#async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...), fileType: str = Form(...), fileInput: UploadFile = File(...)):
+async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...),):
+    global company,url
+    company = companyName
+    url = companyLink
 
-    # Read the file (if needed)
-    contents = await fileInput.read()  # This will read the file content into memory
-    print(f"Received file with size: {len(contents)} bytes")
-
-    # You might want to save the file or process it in some way
-    # For example, saving the file:
-    file_location = f"some_directory/{fileInput.filename}"
-    with open(file_location, "wb") as file:
-        file.write(contents)
-
-    return {"message": "Data received and file saved!"}
-'''
 '''
 @app.post("/process") 
 async def process_input(request: ProcessRequest):
@@ -89,7 +79,7 @@ async def process_input(input_data: UserInput):
         print(f"Received data: {input_data.msg}")
 
         # Assume process_query is a function that processes the user's message and returns a response
-        chatbot_response = customer_support(input_data.msg)
+        chatbot_response = customer_support(input_data.msg,company,url)
 
         # Return JSON response
         return JSONResponse(content={"response": chatbot_response})

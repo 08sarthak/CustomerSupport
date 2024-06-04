@@ -173,7 +173,7 @@ crew = Crew(
 )
 
 # Function to generate a blog post
-def customer_support(msg):
-    result = crew.kickoff(inputs={"company": "Dell","URL": "https://www.dell.com/en-in","inquiry":msg})
+def customer_support(msg,company,url):
+    result = crew.kickoff(inputs={"company": company,"URL": url,"inquiry":msg})
     formatted_result = markdown2.markdown(result)  # Convert the result to Markdown format
     return formatted_result
