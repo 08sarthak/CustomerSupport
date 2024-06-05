@@ -71,11 +71,11 @@ support_quality_assurance_agent = Agent(
     verbose=True
 )
 
-URL="https://www.dell.com/support/home/en-in"
-docs_scrape_tool = ScrapeWebsiteTool(URL)
+#URL="https://www.dell.com/support/home/en-in"
+docs_scrape_tool = ScrapeWebsiteTool()
 #docx_search_tool = DOCXSearchTool()
 #txt_search_tool = TXTSearchTool()
-#pdf_search_tool = PDFSearchTool()
+pdf_search_tool = PDFSearchTool()
 
 
 sentiment_analysis_task = Task(
@@ -117,7 +117,7 @@ inquiry_resolution_task =  Task(
 	    "{inquiry}\n\n"
 		"Make sure to use everything you know "
         "to provide the best support possible."
-        "Use the companies guide to solve the issue(guide)"
+        "Use the companies guide to solve the issue. Guide:{guide}"
 		"You must strive to provide a complete "
         "and accurate response to the customer's inquiry."
     ),
@@ -133,7 +133,7 @@ inquiry_resolution_task =  Task(
 		"tone throughout."
          "Do not include and signing off or closing text."
     ),
-	tools=[docs_scrape_tool],
+	tools=[docs_scrape_tool,pdf_search_tool],
     context=[sentiment_analysis_task, query_analysis_task],
     agent=senior_support_representative_agent
 )
@@ -173,7 +173,8 @@ crew = Crew(
 )
 
 # Function to generate a blog post
-def customer_support(msg,company,url):
-    result = crew.kickoff(inputs={"company": company,"URL": url,"inquiry":msg})
+def customer_support(msg,company,url,file_loc):
+    pdf_search_tool = PDFSearchTool(pdf=str(file_loc))
+    result = crew.kickoff(inputs={"company": company,"URL": url,"inquiry":msg,"guide":file_loc})
     formatted_result = markdown2.markdown(result)  # Convert the result to Markdown format
     return formatted_result

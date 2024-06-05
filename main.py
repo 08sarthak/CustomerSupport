@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request,  Form, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -17,6 +18,8 @@ templates = Jinja2Templates(directory="templates")
 
 company = "."
 url = "."
+file="."
+file_loc="."
 
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
@@ -40,7 +43,7 @@ class ProcessRequest(BaseModel):
     company_name: str
     company_link: str
 '''
-
+'''
 
 @app.post("/submit")
 #async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...), fileType: str = Form(...), fileInput: UploadFile = File(...)):
@@ -48,6 +51,38 @@ async def handle_form_submission(companyName: str = Form(...), companyLink: str 
     global company,url
     company = companyName
     url = companyLink
+'''
+
+@app.post("/submit")
+async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...), fileType: str = Form(...), fileInput: UploadFile = File(...)):
+    global company,url,file,file_loc
+    company = companyName
+    url = companyLink
+    file = fileType
+    # Define the base directory
+    base_dir = Path("C:/Users/Sarthak/Desktop/AI Agents/CustomerSupport/docs")
+    
+    # Ensure the directory exists
+    base_dir.mkdir(parents=True, exist_ok=True)
+
+    # Construct the full file path, ensuring filename is treated as string
+    file_location = base_dir / str(fileInput.filename)
+    
+    # Read and write the file content
+    contents = await fileInput.read()  # This reads the file content into memory
+    
+    try:
+        with open(file_location, "wb") as f:
+            f.write(contents)
+        print(f"File saved at {file_location}")
+    except Exception as e:
+        print(f"Failed to save file: {e}")
+
+    file_loc = file_location
+    '''
+    with open(file_location, "wb") as file:
+        file.write(contents)
+        '''
 
 '''
 @app.post("/process") 
@@ -79,7 +114,7 @@ async def process_input(input_data: UserInput):
         print(f"Received data: {input_data.msg}")
 
         # Assume process_query is a function that processes the user's message and returns a response
-        chatbot_response = customer_support(input_data.msg,company,url)
+        chatbot_response = customer_support(input_data.msg,company,url,file_loc)
 
         # Return JSON response
         return JSONResponse(content={"response": chatbot_response})
