@@ -33,7 +33,7 @@ body {
   text-align: center;
   margin: 0;
   padding: 0;
-  background-image: url("static/css/background.png");
+  background-image: url("/background.png");
   background-size: cover;
 }
 

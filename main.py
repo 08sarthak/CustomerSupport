@@ -8,8 +8,6 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from SupportBot import customer_support  # Assuming blog_writer is in a module named BlogAgent
 
-# Initialize logging
-logging.basicConfig(level=logging.INFO)
 
 app = FastAPI()
 
@@ -37,21 +35,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-'''
-class ProcessRequest(BaseModel):
-    #Query: str
-    company_name: str
-    company_link: str
-'''
-'''
 
-@app.post("/submit")
-#async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...), fileType: str = Form(...), fileInput: UploadFile = File(...)):
-async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...),):
-    global company,url
-    company = companyName
-    url = companyLink
-'''
 
 @app.post("/submit")
 async def handle_form_submission(companyName: str = Form(...), companyLink: str = Form(...), fileType: str = Form(...), fileInput: UploadFile = File(...)):
@@ -84,26 +68,6 @@ async def handle_form_submission(companyName: str = Form(...), companyLink: str 
         file.write(contents)
         '''
 
-'''
-@app.post("/process") 
-async def process_input(request: ProcessRequest):
-    #Query = request.Query
-    company = request.company_name
-    url = request.company_link
-
-    print(f"company:{company},url:{url}")
-    #logging.info(f"Received Query: {Query}")
-     
-    try:
-        # Call the blog_writer function
-        processed_text = customer_support(company,url)
-        logging.info(f"Processed text: {processed_text}")
-    except Exception as e:
-        logging.error(f"Error processing request: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-    
-    return {"processed_text": processed_text}
-'''
 class UserInput(BaseModel):
     msg: str
 
