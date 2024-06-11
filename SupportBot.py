@@ -12,31 +12,31 @@ from utils import get_openai_api_key
 openai_api_key = get_openai_api_key()
 os.environ["OPENAI_MODEL_NAME"] = 'gpt-3.5-turbo'
 
+docs_scrape_tool = ScrapeWebsiteTool()
+docx_search_tool = DOCXSearchTool()
+txt_search_tool = TXTSearchTool()
+pdf_search_tool = PDFSearchTool()
+
 customer_sentiment_analysis_agent = Agent(
     role="Customer Sentiment Analysis Agent",
-    goal="Accurately analyze and interpret the emotional tone of customer messages.",
+    goal="Accurately determine the emotional tone from customer communications.",
     backstory=(
-        "You work at {company} ({URL}) and your primary task is to analyze "
-        "the sentiment of customer interactions to determine their emotional state. "
-        "You need to quickly and accurately identify whether the customer is frustrated, "
-        "neutral, or happy to ensure their query is handled appropriately. "
-        "Your analysis will help route the customer to the right support level, "
-        "improving overall customer satisfaction and support efficiency."
+        "At {company} ({URL}), you analyze customer interactions to identify their emotions. "
+        "Quickly pinpoint if the customer feels frustrated, happy, or neutral. "
+        "Your insights direct the inquiry to the appropriate support tier, boosting satisfaction and efficiency."
     ),
     allow_delegation=False,
     verbose=True
 )
 
 
+
 customer_query_analysis_agent = Agent(
     role="Customer Query Analysis Agent",
-    goal="Thoroughly understand and categorize customer queries.",
+    goal="Precisely understand and classify customer inquiries.",
     backstory=(
-        "You work at {company} ({URL}) and your responsibility is to analyze "
-        "customer queries to understand their nature and categorize them correctly. "
-        "You must ensure that each query is understood correctly and comprehensively. "
-        "for prompt and accurate resolution. Your work is crucial in maintaining the efficiency "
-        "of the support system and ensuring that customers receive timely and appropriate responses."
+        "You are tasked at {company} ({URL}) with dissecting customer queries to grasp and accurately categorize their nature. "
+        "Your detailed analysis ensures queries are swiftly and effectively resolved, maintaining support system fluidity."
     ),
     allow_delegation=False,
     verbose=True
@@ -45,13 +45,11 @@ customer_query_analysis_agent = Agent(
 
 senior_support_representative_agent = Agent(
     role="Senior Support Representative",
-    goal="Be the most friendly and helpful support representative in your team.",
+    goal="Deliver exemplary customer support by leveraging comprehensive company guides without personalized headers or signatures.",
     backstory=(
-        "You work at {company} ({URL}) and are now working on providing "
-        "support to customer for your company. "
-        "You need to make sure that you provide the best support! "
-        "Make sure to provide full complete answers, and make no assumptions. "
-        "Your expertise and friendly approach will ensure customer satisfaction and loyalty."
+        "At {company} ({URL}), you provide top-tier customer support. Utilize company guides to craft thorough, "
+        "precise responses, focusing solely on the content of the answers without using the customer's name or signing off. "
+        "Your commitment to clarity and content-focused responses drives customer loyalty and satisfaction."
     ),
     allow_delegation=False,
     verbose=True
@@ -60,105 +58,70 @@ senior_support_representative_agent = Agent(
 
 support_quality_assurance_agent = Agent(
     role="Support Quality Assurance Agent",
-    goal="Ensure the highest quality of customer support interactions by monitoring and providing feedback.",
+    goal="Guarantee the supreme quality of customer support interactions by focusing on content quality without personalization.",
     backstory=(
-        "You work at {company} ({URL}) and your role is to review support interactions "
-        "to ensure they meet the company's quality standards. "
-        "You will provide constructive feedback to support representatives to help them improve their performance. "
-        "Your goal is to ensure consistent, high-quality support that enhances customer satisfaction and trust."
+        "Working at {company} ({URL}), your role is to ensure all customer support interactions meet the highest standards. "
+        "By providing detailed feedback, you help refine the skills of support representatives, enhancing overall service quality."
     ),
     allow_delegation=False,
     verbose=True
 )
 
-docs_scrape_tool = ScrapeWebsiteTool()
-docx_search_tool = DOCXSearchTool()
-txt_search_tool = TXTSearchTool()
-pdf_search_tool = PDFSearchTool()
-
 
 sentiment_analysis_task = Task(
     description=(
-        "A customer has reached out with an important query:\n"
+        "Analyze the emotional tone of this customer message to guide response strategies:\n"
         "{inquiry}\n\n"
-        "Analyze the emotional tone of the customer's message to determine "
-        "whether they are frustrated, neutral, or happy."
-        "Use your sentiment analysis tools to provide a detailed sentiment report."
+        "Utilize sentiment analysis tools for an accurate emotional assessment."
     ),
     expected_output=(
-        "Give a short analysis on the tone of the customer."
-        "Give key points on the best way to handle the customer according to their sentiment "
+        "Report the detected sentiment (frustrated, neutral, happy) and suggest tailored handling strategies."
     ),
     agent=customer_sentiment_analysis_agent,
     async_execution=True
 )
 
+
 query_analysis_task = Task(
     description=(
-        "A customer has reached out with an important query:\n"
+        "Decompose this customer query to understand its nature and ensure correct categorization:\n"
         "{inquiry}\n\n"
-        "Analyze the customer's query to understand its nature and categorize it correctly."
-        "Provide detailed information about the query, including the main topic, any subtopics, and the customer's intent."
+        "Determine the main topics, subtopics, and the customer's intent for a precise support approach."
     ),
     expected_output=(
-        "A thorough query analysis report that categorizes the customer's inquiry.\n"
-        "The report should include the main topic of the query, subtopics, the customer's intent, and any specific details that "
-        "will help the support representative provide a complete and accurate response."
+        "Provide a comprehensive report categorizing the query, including topics, subtopics, and customer intent."
     ),
     agent=customer_query_analysis_agent,
     async_execution=True
 )
 
 
-inquiry_resolution_task =  Task(
+inquiry_resolution_task = Task(
     description=(
-        "customer just reached out with a query:\n"
-	    "{inquiry}\n\n"
-		"Make sure to use everything you know "
-        "to provide the best support possible."
-        "Use the companies guide to solve the issue. Guide:{guide}"
-		"You must strive to provide a complete "
-        "and accurate response to the customer's inquiry."
+        "Respond to this customer query using the company's detailed guides for reference:\n"
+        "{inquiry}\n\n"
+        "Guide: {guide}\n"
+        "Your response must be comprehensive, focusing solely on the technical or factual content required to resolve the query. "
+        "Avoid personalizing the response with the customer's name or adding any sign-off messages."
     ),
     expected_output=(
-	    "A detailed, informative response to the "
-        "customer's inquiry that addresses "
-        "all aspects of their question.\n"
-        "The response should include references "
-        "to everything you used to find the answer, "
-        "including external data or solutions. "
-        "Ensure the answer is complete, "
-		"leaving no questions unanswered, and maintain a helpful and friendly "
-		"tone throughout."
-         "Do not include and signing off or closing text."
+        "A detailed response that directly addresses all technical or factual aspects of the inquiry, "
+        "referenced with the applicable guide sections. Ensure the response is focused entirely on providing "
+        "solutions without any personalization or sign-off."
     ),
 	tools=[docs_scrape_tool,pdf_search_tool,txt_search_tool,docx_search_tool],
     context=[sentiment_analysis_task, query_analysis_task],
     agent=senior_support_representative_agent
 )
 
-quality_assurance_task =  Task(
+quality_assurance_task = Task(
     description=(
-        "Review the response drafted by the Senior Support Representative for customer's inquiry. "
-        "Ensure that the answer is comprehensive, accurate, and adheres to the "
-		"high-quality standards expected for customer support.\n"
-        "Verify that all parts of the customer's inquiry "
-        "have been addressed "
-		"thoroughly, with a helpful and friendly tone.\n"
-        "Check for references and sources used to "
-        " find the information, "
-		"ensuring the response is well-supported and "
-        "leaves no questions unanswered."
+        "Review and refine this draft response prepared for a customer, ensuring it meets our high standards:\n"
+        "Verify the response is comprehensive, well-supported, and maintains our friendly yet professional tone."
     ),
     expected_output=(
-        "A final, detailed, and informative response "
-        "ready to be sent to the customer.\n"
-        "This response should fully address the "
-        "customer's inquiry, incorporating all "
-		"relevant feedback and improvements.\n"
-		"Don't be too formal, we are a chill and cool company "
-	    "but maintain a professional and friendly tone throughout."
-        "Do not include and signing off or closing text."
+        "Finalize the response ensuring it’s informative, fully addresses the inquiry, and strictly focuses on solution content. "
+        "Confirm that the response includes no personalization or closing remarks, maintaining a professional and focused tone."
     ),
     context=[sentiment_analysis_task, query_analysis_task, inquiry_resolution_task],
     agent=support_quality_assurance_agent
@@ -168,7 +131,13 @@ crew = Crew(
   agents=[customer_sentiment_analysis_agent, customer_query_analysis_agent, senior_support_representative_agent, support_quality_assurance_agent],
   tasks=[sentiment_analysis_task, query_analysis_task, inquiry_resolution_task, quality_assurance_task],
   verbose=2,
-  memory=True
+  memory=True,
+  embedder={
+      "provider": "openai",
+      "config":{
+          "model": 'text-embedding-3-small'
+          }
+  }
 )
 
 # Function to generate a blog post

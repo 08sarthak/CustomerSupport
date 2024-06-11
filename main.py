@@ -21,7 +21,7 @@ file_loc="."
 
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
-    return templates.TemplateResponse("main.html", {"request": request})
+    return templates.TemplateResponse("new.html", {"request": request})
 
 @app.get("/chatbot", response_class=HTMLResponse)
 async def chat_bot(request: Request):
