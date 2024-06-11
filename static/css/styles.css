@@ -21,7 +21,7 @@ body {
 }
 
 .left-section {
-    background: black url('./images/background.png') no-repeat center center;
+    background: black url('../css/background.png') no-repeat center center;
     background-size: cover;
     color: white;
     flex: 1;

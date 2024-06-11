@@ -44,7 +44,7 @@ async def handle_form_submission(companyName: str = Form(...), companyLink: str 
     url = companyLink
     file = fileType
     # Define the base directory
-    base_dir = Path("C:/Users/Sarthak/Desktop/AI Agents/CustomerSupport/docs")
+    base_dir = Path("D:/Downloads/Projects/1/CustomerSupport/docs")
     
     # Ensure the directory exists
     base_dir.mkdir(parents=True, exist_ok=True)

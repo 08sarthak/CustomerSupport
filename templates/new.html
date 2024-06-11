@@ -10,7 +10,7 @@
     <div class="container">
         <div class="left-section">
             <div class="branding">
-                <img src="./images/logo.png" alt="Replit Logo">
+                <img src="../static/images/logo.png" alt="Replit Logo">
             </div>
             <h1>Customer Support, Sentinal</h1>
             <ul class="features">
@@ -52,27 +52,11 @@
                     <input type="file" id="fileInput" name="fileInput" required>
                 </div>
                 <div id="errorMessage" style="color: red;"></div>
-                <div id="outputContent"></div>
             </form>
             <button class="button-3" role="button" onclick="submitForm()">Continue to Chatbot</button>
         </div>
-
-        
-    <div class="container mt-5">
-        <div id="loadingContainer" style="display: none;">
-            <div class="loader"></div>
-            <div id="loadingMessage">Processing request...</div>
-        </div>
-
-        <div class="container mt-5">
-            <div class="mt-5">
-                <h2>Processed Content</h2>
-                <div id="outputContent" class="border p-3"></div>
-                <div id="errorMessage" class="text-danger mt-2"></div>
-            </div>
-        </div>
     </div>
-    </div>
+
     <script>
         function selectFileType(type) {
             document.getElementById('fileType').value = type;
@@ -93,11 +77,9 @@
 
             // Elements for displaying messages
             const errorMessage = document.getElementById('errorMessage');
-            const outputContent = document.getElementById('outputContent');
 
             // Clear previous messages
             errorMessage.innerText = '';
-            outputContent.innerHTML = '';
 
             if (!fileName.endsWith(`.${fileType}`)) {
                 errorMessage.innerText = `Please upload a ${fileType.toUpperCase()} file.`;
@@ -109,13 +91,13 @@
             formData.append('companyLink', companyLink);
             formData.append('fileType', fileType);
             formData.append('fileInput', fileInput.files[0]);
-        
+
             // Send the data asynchronously without waiting for the response
             fetch('/submit', {
                 method: 'POST',
                 body: formData
             });
-        
+
             // Immediately redirect to the chatbot page
             window.location.href = "/chatbot";
         }
